@@ -20,6 +20,12 @@ class PdfAttachment < Attachment
   has_attachment :content_type => 'pdf'
 end
 
+class PdfWithThumbsAttachment < Attachment
+  has_attachment :content_type => 'pdf', 
+                 :thumbnails => { :thumb => [50, 50]},
+                 :thumbnail_pdf_files => true
+end
+
 class DocAttachment < Attachment
   has_attachment :content_type => %w(pdf doc txt)
 end

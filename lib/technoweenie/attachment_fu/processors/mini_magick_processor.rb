@@ -24,7 +24,7 @@ module Technoweenie # :nodoc:
           end
           
           def supports_pdf?
-            true
+            false
           end
         end
 

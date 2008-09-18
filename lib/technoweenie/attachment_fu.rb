@@ -1,3 +1,5 @@
+require 'ruby-debug'
+
 module Technoweenie # :nodoc:
   module AttachmentFu # :nodoc:
     @@default_processors = %w(ImageScience Rmagick MiniMagick Gd2 CoreImage)
@@ -232,6 +234,7 @@ module Technoweenie # :nodoc:
 
       # Returns true/false if an attachment is thumbnailable.  A thumbnailable attachment has an image content type and the parent_id attribute.
       def thumbnailable?
+        #debugger
         (image? || (pdf? && attachment_options[:thumbnail_pdf_files] && supports_pdf?)) && respond_to?(:parent_id) && parent_id.nil?
       end
 
@@ -251,7 +254,7 @@ module Technoweenie # :nodoc:
         ext.sub!(/gif$/, 'png') if attachment_options[:processor] == "ImageScience"
         
         # Change the output extension if PDFs are being converted
-        ext = ".png" if attachment_options[:thumbnail_pdf_files]
+        ext = ".png" if attachment_options[:thumbnail_pdf_files] && respond_to?(:parent) && parent && parent.pdf?
         
         "#{basename}_#{thumbnail}#{ext}"
       end
@@ -415,10 +418,17 @@ module Technoweenie # :nodoc:
 
         # validates the size and content_type attributes according to the current model's options
         def attachment_attributes_valid?
-          [:size, :content_type].each do |attr_name|
+          
+          [:size].each do |attr_name|
             enum = attachment_options[attr_name]
-            #errors.add attr_name, ActiveRecord::Errors.default_error_messages[:inclusion] unless enum.nil? || enum.include?(send(attr_name))
+            errors.add attr_name, ActiveRecord::Errors.default_error_messages[:inclusion] unless enum.nil? || enum.include?(send(attr_name))
           end
+          #validate content type separately because a PDF could have a thumbnail of type image/png which the model may not allow
+          content_types = attachment_options[:content_type]
+          content_types << "image/png" if content_types && self.respond_to?(:parent) && self.parent && self.parent.pdf? && process_pdfs?
+          errors.add :content_type, ActiveRecord::Errors.default_error_messages[:inclusion] unless content_types.nil? || content_types.include?(send(:content_type))
+
+          
         end
 
         # Initializes a new thumbnail with the given suffix.

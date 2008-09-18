@@ -50,7 +50,7 @@ module Technoweenie # :nodoc:
             img.change_geometry(size.to_s) { |cols, rows, image| image.resize!(cols<1 ? 1 : cols, rows<1 ? 1 : rows) }
           end
           img.strip! unless attachment_options[:keep_profile]
-          if parent && parent.pdf? && process_pdfs?
+          if respond_to?(:parent) && parent && parent.pdf? && process_pdfs?
             output_format = 'PNG'
           else
             output_format = img.format
