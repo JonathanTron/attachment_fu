@@ -15,6 +15,10 @@ module Technoweenie # :nodoc:
             im = GD2::Image.import(file)
             block.call(im)
           end
+          
+          def supports_pdf?
+            false
+          end
         end
 
         protected

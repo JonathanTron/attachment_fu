@@ -22,6 +22,10 @@ module Technoweenie # :nodoc:
           ensure
             !binary_data.nil?
           end
+          
+          def supports_pdf?
+            true
+          end
         end
 
       protected

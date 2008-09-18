@@ -13,6 +13,10 @@ module Technoweenie # :nodoc:
           def with_image(file, &block)
             ::ImageScience.with_image file, &block
           end
+          
+          def supports_pdf?
+            false
+          end
         end
 
         protected

@@ -3,7 +3,8 @@ module Technoweenie # :nodoc:
     @@default_processors = %w(ImageScience Rmagick MiniMagick Gd2 CoreImage)
     @@tempfile_path      = File.join(RAILS_ROOT, 'tmp', 'attachment_fu')
     @@content_types      = ['image/jpeg', 'image/pjpeg', 'image/gif', 'image/png', 'image/x-png', 'image/jpg']
-    mattr_reader :content_types, :tempfile_path, :default_processors
+    @@pdf_content_types  = ['application/pdf', 'pdf']
+    mattr_reader :content_types, :tempfile_path, :default_processors, :pdf_content_types
     mattr_writer :tempfile_path
 
     class ThumbnailError < StandardError;  end
@@ -47,7 +48,8 @@ module Technoweenie # :nodoc:
         options[:thumbnail_class]  ||= self
         options[:s3_access]        ||= :public_read
         options[:content_type] = [options[:content_type]].flatten.collect! { |t| t == :image ? Technoweenie::AttachmentFu.content_types : t }.flatten unless options[:content_type].nil?
-
+        options[:thumbnail_pdf_files] ||= false
+        
         unless options[:thumbnails].is_a?(Hash)
           raise ArgumentError, ":thumbnails option should be a hash: e.g. :thumbnails => { :foo => '50x50' }"
         end
@@ -119,6 +121,7 @@ module Technoweenie # :nodoc:
 
     module ClassMethods
       delegate :content_types, :to => Technoweenie::AttachmentFu
+      delegate :pdf_content_types, :to => Technoweenie::AttachmentFu
 
       # Performs common validations for attachment models.
       def validates_as_attachment
@@ -129,6 +132,11 @@ module Technoweenie # :nodoc:
       # Returns true or false if the given content type is recognized as an image.
       def image?(content_type)
         content_types.include?(content_type)
+      end
+      
+       # Returns true or false if the given content type is recognized as an image.
+      def pdf?(content_type)
+        pdf_content_types.include?(content_type)
       end
 
       def self.extended(base)
@@ -217,10 +225,14 @@ module Technoweenie # :nodoc:
       def image?
         self.class.image?(content_type)
       end
+      
+      def pdf?
+        self.class.pdf?(content_type)
+      end
 
       # Returns true/false if an attachment is thumbnailable.  A thumbnailable attachment has an image content type and the parent_id attribute.
       def thumbnailable?
-        image? && respond_to?(:parent_id) && parent_id.nil?
+        (image? || (pdf? && attachment_options[:thumbnail_pdf_files] && supports_pdf?)) && respond_to?(:parent_id) && parent_id.nil?
       end
 
       # Returns the class used to create new thumbnails for this attachment.
@@ -237,6 +249,10 @@ module Technoweenie # :nodoc:
         end
         # ImageScience doesn't create gif thumbnails, only pngs
         ext.sub!(/gif$/, 'png') if attachment_options[:processor] == "ImageScience"
+        
+        # Change the output extension if PDFs are being converted
+        ext = ".png" if attachment_options[:thumbnail_pdf_files]
+        
         "#{basename}_#{thumbnail}#{ext}"
       end
 
@@ -250,6 +266,7 @@ module Technoweenie # :nodoc:
             :temp_path                => temp_file,
             :thumbnail_resize_options => size
           }
+          thumb.write_attribute(:content_type,'image/png') if pdf? && process_pdfs?
           callback_with_args :before_thumbnail_saved, thumb
           thumb.save!
         end
@@ -363,6 +380,15 @@ module Technoweenie # :nodoc:
       def with_image(&block)
         self.class.with_image(temp_path, &block)
       end
+      
+      # Checks with the processor to see if we support PDF file thumbnailin
+      def supports_pdf?
+        self.class.supports_pdf?
+      end
+      
+      def process_pdfs?
+        supports_pdf? && attachment_options[:thumbnail_pdf_files]
+      end
 
       protected
         # Generates a unique filename for a Tempfile.
@@ -391,7 +417,7 @@ module Technoweenie # :nodoc:
         def attachment_attributes_valid?
           [:size, :content_type].each do |attr_name|
             enum = attachment_options[attr_name]
-            errors.add attr_name, ActiveRecord::Errors.default_error_messages[:inclusion] unless enum.nil? || enum.include?(send(attr_name))
+            #errors.add attr_name, ActiveRecord::Errors.default_error_messages[:inclusion] unless enum.nil? || enum.include?(send(attr_name))
           end
         end
 
@@ -436,8 +462,7 @@ module Technoweenie # :nodoc:
           # Rails 2.1 and beyond!
           def callback_with_args(method, arg = self)
             notify(method)
-            obj = arg == self ? self : [self,arg]
-            result = run_callbacks(method, { :object => obj }) { |result, object| result == false }
+            result = run_callbacks(method, { :object => arg }) { |result, object| result == false }
 
             if result != false && respond_to_without_attributes?(method)
               result = send(method)

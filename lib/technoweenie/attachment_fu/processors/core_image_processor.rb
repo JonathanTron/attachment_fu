@@ -13,6 +13,10 @@ module Technoweenie # :nodoc:
           def with_image(file, &block)
             block.call OSX::CIImage.from(file)
           end
+          
+          def supports_pdf?
+            false
+          end
         end
                 
         protected
