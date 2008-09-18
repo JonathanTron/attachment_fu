@@ -436,8 +436,8 @@ module Technoweenie # :nodoc:
           # Rails 2.1 and beyond!
           def callback_with_args(method, arg = self)
             notify(method)
-            obj = arg == self ? self : [self,arg]
-            result = run_callbacks(method, { :object => obj }) { |result, object| result == false }
+
+            result = run_callbacks(method, { :object => arg }) { |result, object| result == false }
 
             if result != false && respond_to_without_attributes?(method)
               result = send(method)
