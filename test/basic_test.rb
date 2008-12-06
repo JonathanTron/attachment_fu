@@ -24,17 +24,78 @@ class BasicTest < Test::Unit::TestCase
   def test_should_normalize_content_types_to_array
     assert_equal %w(pdf), PdfAttachment.attachment_options[:content_type]
     assert_equal %w(pdf doc txt), DocAttachment.attachment_options[:content_type]
-    assert_equal ['image/jpeg', 'image/pjpeg', 'image/gif', 'image/png', 'image/x-png', 'image/jpg'], ImageAttachment.attachment_options[:content_type]
-    assert_equal ['pdf', 'image/jpeg', 'image/pjpeg', 'image/gif', 'image/png', 'image/x-png', 'image/jpg'], ImageOrPdfAttachment.attachment_options[:content_type]
+    assert_equal [ "image/jpeg",
+                   "image/pjpeg",
+                   "image/jpg",
+                   "image/gif",
+                   "image/png",
+                   "image/x-png",
+                   "image/jpg",
+                   "image/x-ms-bmp",
+                   "image/bmp",
+                   "image/x-bmp",
+                   "image/x-bitmap",
+                   "image/x-xbitmap",
+                   "image/x-win-bitmap",
+                   "image/x-windows-bmp",
+                   "image/ms-bmp",
+                   "application/bmp",
+                   "application/x-bmp",
+                   "application/x-win-bitmap",
+                   "application/preview",
+                   "image/jp_",
+                   "application/jpg",
+                   "application/x-jpg",
+                   "image/pipeg",
+                   "image/vnd.swiftview-jpeg",
+                   "image/x-xbitmap",
+                   "application/png",
+                   "application/x-png",
+                   "image/gi_",
+                   "image/x-citrix-pjpeg"], ImageAttachment.attachment_options[:content_type]
+    assert_equal   ["pdf",
+                    "image/jpeg",
+                    "image/pjpeg",
+                    "image/jpg",
+                    "image/gif",
+                    "image/png",
+                    "image/x-png",
+                    "image/jpg",
+                    "image/x-ms-bmp",
+                    "image/bmp",
+                    "image/x-bmp",
+                    "image/x-bitmap",
+                    "image/x-xbitmap",
+                    "image/x-win-bitmap",
+                    "image/x-windows-bmp",
+                    "image/ms-bmp",
+                    "application/bmp",
+                    "application/x-bmp",
+                    "application/x-win-bitmap",
+                    "application/preview",
+                    "image/jp_",
+                    "application/jpg",
+                    "application/x-jpg",
+                    "image/pipeg",
+                    "image/vnd.swiftview-jpeg",
+                    "image/x-xbitmap",
+                    "application/png",
+                    "application/x-png",
+                    "image/gi_",
+                    "image/x-citrix-pjpeg"], ImageOrPdfAttachment.attachment_options[:content_type]
   end
   
   def test_should_sanitize_content_type
-    @attachment = Attachment.new :content_type => ' foo '
+    @attachment = Attachment.new
+    @attachment.content_type = ' foo '
+    
     assert_equal 'foo', @attachment.content_type
   end
   
   def test_should_sanitize_filenames
-    @attachment = Attachment.new :filename => 'blah/foo.bar'
+    @attachment = Attachment.new
+    @attachment.filename = 'blah/foo.bar'
+    
     assert_equal 'foo.bar',    @attachment.filename
 
     @attachment.filename = 'blah\\foo.bar'
@@ -51,7 +112,9 @@ class BasicTest < Test::Unit::TestCase
   end
   
   def test_should_convert_thumbnail_name
-    @attachment = FileAttachment.new :filename => 'foo.bar'
+    @attachment = FileAttachment.new
+    @attachment.filename = 'foo.bar'
+    
     assert_equal 'foo.bar',           @attachment.thumbnail_name_for(nil)
     assert_equal 'foo.bar',           @attachment.thumbnail_name_for('')
     assert_equal 'foo_blah.bar',      @attachment.thumbnail_name_for(:blah)

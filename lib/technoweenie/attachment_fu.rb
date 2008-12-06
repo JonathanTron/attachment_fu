@@ -79,6 +79,7 @@ module Technoweenie # :nodoc:
         options[:s3_access]        ||= :public_read
         options[:content_type] = [options[:content_type]].flatten.collect! { |t| t == :image ? Technoweenie::AttachmentFu.content_types : t }.flatten unless options[:content_type].nil?
         options[:thumbnail_pdf_files] ||= false
+        options[:pdf_size_use_crop_box] ||= false
         
         unless options[:thumbnails].is_a?(Hash)
           raise ArgumentError, ":thumbnails option should be a hash: e.g. :thumbnails => { :foo => '50x50' }"
@@ -438,17 +439,17 @@ module Technoweenie # :nodoc:
 
         # validates the size and content_type attributes according to the current model's options
         def attachment_attributes_valid?
+          # Rails 2.2+ deprecates the ActiveRecord::Errors.default_error_messages 
+          ar_error_messages = Object.const_defined?(:I18n) ? I18n.translate('activerecord.errors.messages') : ActiveRecord::Errors.default_error_messages
           
           [:size].each do |attr_name|
             enum = attachment_options[attr_name]
-            errors.add attr_name, ActiveRecord::Errors.default_error_messages[:inclusion] unless enum.nil? || enum.include?(send(attr_name))
+            errors.add attr_name, ar_error_messages[:inclusion] unless enum.nil? || enum.include?(send(attr_name))
           end
           #validate content type separately because a PDF could have a thumbnail of type image/png which the model may not allow
           content_types = attachment_options[:content_type]
           content_types << "image/png" if content_types && self.respond_to?(:parent) && self.parent && self.parent.pdf? && process_pdfs?
-          errors.add :content_type, ActiveRecord::Errors.default_error_messages[:inclusion] unless content_types.nil? || content_types.include?(send(:content_type))
-
-          
+          errors.add :content_type, ar_error_messages[:inclusion] unless content_types.nil? || content_types.include?(send(:content_type))
         end
 
         # Initializes a new thumbnail with the given suffix.
