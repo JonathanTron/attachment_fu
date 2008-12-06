@@ -26,30 +26,31 @@ In the model there are two methods made available by this plugins: has_attachmen
 
 has_attachment(options = {})
   This method accepts the options in a hash:
-    :content_type     # Allowed content types.
-                      # Allows all by default.  Use :image to allow all standard image types.
-    :min_size         # Minimum size allowed.
-                      # 1 byte is the default.
-    :max_size         # Maximum size allowed.
-                      # 1.megabyte is the default.
-    :size             # Range of sizes allowed.
-                      # (1..1.megabyte) is the default.  This overrides the :min_size and :max_size options.
-    :resize_to        # Used by RMagick to resize images.
-                      # Pass either an array of width/height, or a geometry string.
-    :thumbnails       # Specifies a set of thumbnails to generate.
-                      # This accepts a hash of filename suffixes and RMagick resizing options.
-                      # This option need only be included if you want thumbnailing.
-    :thumbnail_class  # Set which model class to use for thumbnails.
-                      # This current attachment class is used by default.
-    :path_prefix      # path to store the uploaded files.
-                      # Uses public/#{table_name} by default for the filesystem, and just #{table_name} for the S3 backend.  
-                      # Setting this sets the :storage to :file_system.
-    :partition        # Partiton files in directories like /0000/0001/image.jpg. Default is true. 
-    :storage          # Specifies the storage system to use..
-                      # Defaults to :db_file.  Options are :file_system, :db_file, and :s3.
-    :processor        # Sets the image processor to use for resizing of the attached image.
-                      # Options include ImageScience, Rmagick, and MiniMagick.  Default is whatever is installed.
-    
+    :content_type       # Allowed content types.
+                        # Allows all by default.  Use :image to allow all standard image types.
+    :min_size           # Minimum size allowed.
+                        # 1 byte is the default.
+    :max_size           # Maximum size allowed.
+                        # 1.megabyte is the default.
+    :size               # Range of sizes allowed.
+                        # (1..1.megabyte) is the default.  This overrides the :min_size and :max_size options.
+    :resize_to          # Used by RMagick to resize images.
+                        # Pass either an array of width/height, or a geometry string.
+    :thumbnails         # Specifies a set of thumbnails to generate.
+                        # This accepts a hash of filename suffixes and RMagick resizing options.
+                        # This option need only be included if you want thumbnailing.
+    :thumbnail_class    # Set which model class to use for thumbnails.
+                        # This current attachment class is used by default.
+    :path_prefix        # path to store the uploaded files.
+                        # Uses public/#{table_name} by default for the filesystem, and just #{table_name} for the S3 backend.  
+                        # Setting this sets the :storage to :file_system.
+    :partition          #  Partiton files in directories like /0000/0001/image.jpg. Default is true. 
+    :storage            # Specifies the storage system to use..
+                        # Defaults to :db_file.  Options are :file_system, :db_file, and :s3.
+    :processor          # Sets the image processor to use for resizing of the attached image.
+                        # Options include ImageScience, Rmagick, and MiniMagick.  Default is whatever is installed.
+    :thumbnail_pdf_files # Defaults to false. Set to true if pdf files should be converted into PNG file thumbnails
+                         # only supported for rmagick processor
 
   Examples:
     has_attachment :max_size => 1.kilobyte

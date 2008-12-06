@@ -23,6 +23,10 @@ module Technoweenie # :nodoc:
           ensure
             !binary_data.nil?
           end
+          
+          def supports_pdf?
+            true
+          end
         end
 
       protected
@@ -33,7 +37,7 @@ module Technoweenie # :nodoc:
             self.width  = img.columns if respond_to?(:width)
             self.height = img.rows    if respond_to?(:height)
             callback_with_args :after_resize, img
-          end if image?
+          end if image? || (pdf? && process_pdfs?)
         end
 
         # Performs the actual resizing operation for a thumbnail
@@ -46,7 +50,12 @@ module Technoweenie # :nodoc:
             img.change_geometry(size.to_s) { |cols, rows, image| image.resize!(cols<1 ? 1 : cols, rows<1 ? 1 : rows) }
           end
           img.strip! unless attachment_options[:keep_profile]
-          temp_paths.unshift write_to_temp_file(img.to_blob)
+          if respond_to?(:parent) && parent && parent.pdf? && process_pdfs?
+            output_format = 'PNG'
+          else
+            output_format = img.format
+          end  
+          temp_paths.unshift write_to_temp_file(img.to_blob {self.format = output_format})
         end
       end
     end

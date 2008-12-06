@@ -13,6 +13,10 @@ module Technoweenie # :nodoc:
           def with_image(file, &block)
             block.call OSX::CIImage.from(file)
           end
+          
+          def supports_pdf?
+            false
+          end
         end
                 
         protected
@@ -22,7 +26,7 @@ module Technoweenie # :nodoc:
               self.width  = img.extent.size.width  if respond_to?(:width)
               self.height = img.extent.size.height if respond_to?(:height)
               resize_image_or_thumbnail! img
-              callback_with_args :after_resize, img
+              callback_with_args :after_resize, [self,img]
             end if image?
           end
 
