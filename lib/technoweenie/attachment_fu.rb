@@ -60,6 +60,9 @@ module Technoweenie # :nodoc:
       #      bucket in the amazon_s3.yml file.
 
       # *  <tt>:keep_profile</tt> By default image EXIF data will be stripped to minimize image size. For small thumbnails this proivides important savings. Picture quality is not affected. Set to false if you want to keep the image profile as is. ImageScience will allways keep EXIF data.
+      
+      # *  <tt>:thumbnail_pdf_files</tt> - Generate a thumbnail for pdf file too (only compatible with RMagick). false is the default.
+      # *  <tt>:pdf_size_use_crop_box</tt> - Specify if pdf size reported by RMagick should be the crop_box one (useful for pdf cropped for print). false is the default.
       #
       # Examples:
       #   has_attachment :max_size => 1.kilobyte

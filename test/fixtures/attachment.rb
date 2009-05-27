@@ -26,6 +26,23 @@ class PdfWithThumbsAttachment < Attachment
                  :thumbnail_pdf_files => true
 end
 
+class PdfWithoutThumbsAttachment < Attachment
+  has_attachment :content_type => 'pdf', 
+                 :thumbnail_pdf_files => false
+end
+
+class PdfWithoutThumbsWithoutCropboxAttachment < Attachment
+  has_attachment :content_type => 'pdf', 
+                 :thumbnail_pdf_files => false,
+                 :pdf_size_use_crop_box => false
+end
+
+class PdfWithoutThumbsWithCropboxAttachment < Attachment
+  has_attachment :content_type => 'pdf', 
+                 :thumbnail_pdf_files => false,
+                 :pdf_size_use_crop_box => true
+end
+
 class DocAttachment < Attachment
   has_attachment :content_type => %w(pdf doc txt)
 end

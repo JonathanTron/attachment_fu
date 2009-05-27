@@ -13,8 +13,8 @@ module Technoweenie # :nodoc:
           def with_image(file, &block)
             begin
               # Workaround block scope for RMagick infos settings
-              @crop_box = attachment_options[:pdf_size_use_crop_box]
-              binary_data = file.is_a?(Magick::Image) ? file : Magick::Image.read(file){ self['pdf:use-cropbox'] = @crop_box }.first unless !Object.const_defined?(:Magick)
+              crop_box = attachment_options[:pdf_size_use_crop_box]
+              binary_data = file.is_a?(Magick::Image) ? file : Magick::Image.read(file){ self['pdf:use-cropbox'] = crop_box }.first unless !Object.const_defined?(:Magick)
             rescue
               # Log the failure to load the image.  This should match ::Magick::ImageMagickError
               # but that would cause acts_as_attachment to require rmagick.
@@ -35,11 +35,11 @@ module Technoweenie # :nodoc:
         def process_attachment_with_processing
           return unless process_attachment_without_processing
           with_image do |img|
-            resize_image_or_thumbnail! img
+            resize_image_or_thumbnail!(img) if image? || (pdf? && process_pdfs?)
             self.width  = img.columns if respond_to?(:width)
             self.height = img.rows    if respond_to?(:height)
             callback_with_args :after_resize, [self, img]
-          end if image? || (pdf? && process_pdfs?)
+          end if image? || pdf?
         end
 
         # Performs the actual resizing operation for a thumbnail
