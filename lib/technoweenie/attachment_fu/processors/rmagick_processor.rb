@@ -12,7 +12,9 @@ module Technoweenie # :nodoc:
           # Yields a block containing an RMagick Image for the given binary data.
           def with_image(file, &block)
             begin
-              binary_data = file.is_a?(Magick::Image) ? file : Magick::Image.read(file).first unless !Object.const_defined?(:Magick)
+              # Workaround block scope for RMagick infos settings
+              @crop_box = attachment_options[:pdf_size_use_crop_box]
+              binary_data = file.is_a?(Magick::Image) ? file : Magick::Image.read(file){ self['pdf:use-cropbox'] = @crop_box }.first unless !Object.const_defined?(:Magick)
             rescue
               # Log the failure to load the image.  This should match ::Magick::ImageMagickError
               # but that would cause acts_as_attachment to require rmagick.
@@ -23,6 +25,10 @@ module Technoweenie # :nodoc:
           ensure
             !binary_data.nil?
           end
+          
+          def supports_pdf?
+            true
+          end
         end
 
       protected
@@ -32,8 +38,8 @@ module Technoweenie # :nodoc:
             resize_image_or_thumbnail! img
             self.width  = img.columns if respond_to?(:width)
             self.height = img.rows    if respond_to?(:height)
-            callback_with_args :after_resize, img
-          end if image?
+            callback_with_args :after_resize, [self, img]
+          end if image? || (pdf? && process_pdfs?)
         end
 
         # Performs the actual resizing operation for a thumbnail
@@ -49,7 +55,12 @@ module Technoweenie # :nodoc:
             img.change_geometry(size.to_s) { |cols, rows, image| image.resize!(cols<1 ? 1 : cols, rows<1 ? 1 : rows) }
           end
           img.strip! unless attachment_options[:keep_profile]
-          temp_paths.unshift write_to_temp_file(img.to_blob)
+          if respond_to?(:parent) && parent && parent.pdf? && process_pdfs?
+            output_format = 'PNG'
+          else
+            output_format = img.format
+          end  
+          temp_paths.unshift write_to_temp_file(img.to_blob {self.format = output_format})
         end
       end
     end

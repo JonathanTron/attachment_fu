@@ -13,6 +13,10 @@ module Technoweenie # :nodoc:
           def with_image(file, &block)
             ::ImageScience.with_image file, &block
           end
+          
+          def supports_pdf?
+            false
+          end
         end
 
         protected
@@ -40,7 +44,7 @@ module Technoweenie # :nodoc:
               self.height = img.height if respond_to?(:height)
               img.save self.temp_path
               self.size = File.size(self.temp_path)
-              callback_with_args :after_resize, img
+              callback_with_args :after_resize, [self,img]
             end
 
             size = size.first if size.is_a?(Array) && size.length == 1

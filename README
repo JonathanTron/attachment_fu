@@ -54,7 +54,8 @@ has_attachment(options = {})
                       # Options include ImageScience, Rmagick, and MiniMagick.  Default is whatever is installed.
     :uuid_primary_key # If your model's primary key is a 128-bit UUID in hexadecimal format, then set this to true.
     :association_options  # attachment_fu automatically defines associations with thumbnails with has_many and belongs_to. If there are any additional options that you want to pass to these methods, then specify them here.
-    
+    :thumbnail_pdf_files # Defaults to false. Set to true if pdf files should be converted into PNG file thumbnails
+                         # only supported for rmagick processor
 
   Examples:
     has_attachment :max_size => 1.kilobyte

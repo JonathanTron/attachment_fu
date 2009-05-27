@@ -89,6 +89,7 @@ class RmagickTest < Test::Unit::TestCase
       assert !attachment.db_file.new_record? if attachment.respond_to?(:db_file)
       assert  attachment.image?
       assert !attachment.size.zero?
+
       #assert_equal 3915, attachment.size
       assert_equal 39,   attachment.width
       assert_equal 50,   attachment.height
@@ -123,6 +124,7 @@ class RmagickTest < Test::Unit::TestCase
         assert_equal 55,   attachment.width
         assert_equal 55,   attachment.height
         assert_equal 2,    attachment.thumbnails.length
+
         assert_equal 1.0,  attachment.aspect_ratio
         
         thumb = attachment.thumbnails.detect { |t| t.filename =~ /_thumb/ }

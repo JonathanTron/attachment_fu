@@ -1,3 +1,6 @@
+* Sep 18 2008 *
+* support thumbnailing of PDF files into PNG files with rmagick processor
+
 * Apr 17 2008 *
 * amazon_s3.yml is now passed through ERB before being passed to AWS::S3 [François Beausoleil]
 

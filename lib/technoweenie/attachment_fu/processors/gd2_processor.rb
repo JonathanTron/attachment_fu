@@ -15,6 +15,10 @@ module Technoweenie # :nodoc:
             im = GD2::Image.import(file)
             block.call(im)
           end
+          
+          def supports_pdf?
+            false
+          end
         end
 
         protected
@@ -24,7 +28,7 @@ module Technoweenie # :nodoc:
               resize_image_or_thumbnail! img
               self.width  = img.width
               self.height = img.height
-              callback_with_args :after_resize, img
+              callback_with_args :after_resize, [self,img]
             end
           end
 
