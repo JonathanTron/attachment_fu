@@ -14,7 +14,7 @@ module Technoweenie # :nodoc:
             begin
               # Workaround block scope for RMagick infos settings
               crop_box = attachment_options[:pdf_size_use_crop_box]
-              binary_data = file.is_a?(Magick::Image) ? file : Magick::Image.read(file){ self['pdf:use-cropbox'] = crop_box }.first unless !Object.const_defined?(:Magick)
+              binary_data = file.is_a?(Magick::Image) ? file : Magick::Image.ping(file){ self['pdf:use-cropbox'] = crop_box }.first unless !Object.const_defined?(:Magick)
             rescue
               # Log the failure to load the image.  This should match ::Magick::ImageMagickError
               # but that would cause acts_as_attachment to require rmagick.
