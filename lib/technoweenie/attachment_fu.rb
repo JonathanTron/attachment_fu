@@ -63,6 +63,7 @@ module Technoweenie # :nodoc:
       
       # *  <tt>:thumbnail_pdf_files</tt> - Generate a thumbnail for pdf file too (only compatible with RMagick). false is the default.
       # *  <tt>:pdf_size_use_crop_box</tt> - Specify if pdf size reported by RMagick should be the crop_box one (useful for pdf cropped for print). false is the default.
+      # *  <tt>:pdf_skip_width_height</tt> - Specify if we should skip width/height for pdf (this cause RMagick to generate BIG ). false is default
       #
       # Examples:
       #   has_attachment :max_size => 1.kilobyte
@@ -90,6 +91,7 @@ module Technoweenie # :nodoc:
         options[:content_type] = [options[:content_type]].flatten.collect! { |t| t == :image ? Technoweenie::AttachmentFu.content_types : t }.flatten unless options[:content_type].nil?
         options[:thumbnail_pdf_files] ||= false
         options[:pdf_size_use_crop_box] ||= false
+        options[:pdf_skip_width_height] ||= false
         
         unless options[:thumbnails].is_a?(Hash)
           raise ArgumentError, ":thumbnails option should be a hash: e.g. :thumbnails => { :foo => '50x50' }"

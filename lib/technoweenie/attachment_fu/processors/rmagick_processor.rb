@@ -32,8 +32,12 @@ module Technoweenie # :nodoc:
         end
 
       protected
+        def process_file?
+          !pdf? || (pdf? && !attachment_options[:pdf_skip_width_height])
+        end
+
         def process_attachment_with_processing
-          return unless process_attachment_without_processing
+          return if !process_attachment_without_processing || !process_file?
           with_image do |img|
             resize_image_or_thumbnail!(img) if image? || (pdf? && process_pdfs?)
             self.width  = img.columns if respond_to?(:width)

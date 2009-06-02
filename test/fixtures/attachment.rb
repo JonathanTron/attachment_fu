@@ -43,6 +43,11 @@ class PdfWithoutThumbsWithCropboxAttachment < Attachment
                  :pdf_size_use_crop_box => true
 end
 
+class PdfWithoutThumbsWithSkipWidthHeightAttachment < Attachment
+  has_attachment :content_type => 'pdf', 
+                 :pdf_skip_width_height => true
+end
+
 class DocAttachment < Attachment
   has_attachment :content_type => %w(pdf doc txt)
 end
